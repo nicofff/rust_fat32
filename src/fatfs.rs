@@ -39,7 +39,7 @@ impl FatFileSystem {
 
 		let layout = FileSystemLayout {
 			fat_start : boot_record.reserved_sectors,
-			clusters_start: boot_record.reserved_sectors as u32 + (boot_record.fat_copies as u32 * boot_record.sectors_per_fat),
+			clusters_start: ((boot_record.reserved_sectors as u32 + (boot_record.fat_copies as u32 * boot_record.sectors_per_fat)) * boot_record.bytes_per_sector	as u32),
 			sectors_per_cluster: boot_record.sectors_per_cluster,
 			root_dir: boot_record.root_directory_cluster_start,
 			cluster_size: boot_record.sectors_per_cluster as u16 * boot_record.bytes_per_sector
@@ -48,6 +48,8 @@ impl FatFileSystem {
 			file: file,
 			layout: layout
 		};
+		println!("{:?}",boot_record);
+		println!("{:?}",fs.layout);
 		fs
 	}
 
@@ -70,12 +72,10 @@ impl FatFileSystem {
 
 	pub fn read_cluster(&mut self,cluster_number: u32) -> Vec<u8> {
 		let mut ret = vec![0u8;self.layout.cluster_size as usize];
-		println!("{:?}",ret.len() );
-
-		let seek_location = self.layout.clusters_start + cluster_number * self.layout.cluster_size as u32;
+		let seek_location = self.layout.clusters_start + (cluster_number -2)* self.layout.cluster_size as u32;
 		self.file.seek(SeekFrom::Start(seek_location as u64));
 		let read = self.file.read(&mut ret);
-		println!("{:?}",seek_location as usize );
+		println!("{:?}",str::from_utf8(&ret[0..7]));
 		ret
 	}
 
