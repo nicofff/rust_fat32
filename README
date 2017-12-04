@@ -1,3 +1,3 @@
 Craete volume  
-dd if=/dev/zero of=fat.fs bs=1024 count=1048576
+dd if=/dev/zero of=fat.fs bs=1024 count=1048576  
 mkfs.fat fat.fs
