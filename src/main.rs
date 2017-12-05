@@ -4,10 +4,7 @@ extern crate libc;
 extern crate time;
 extern crate byteorder;
 
-use std::env;
 use std::ffi::OsStr;
-use std::fs::File;
-use std::io::prelude::*;
 use libc::ENOENT;
 use time::Timespec;
 use fuse::{FileType, FileAttr, Filesystem, Request, ReplyData, ReplyEntry, ReplyAttr, ReplyDirectory};
@@ -101,6 +98,8 @@ fn main() {
     let mountpoint = env::args_os().nth(1).unwrap();
     fuse::mount(HelloFS, &mountpoint, &[]).unwrap();*/
     let mut thefs = fatfs::FatFileSystem::new("fat.fs");
-    let rootDir = thefs.read_cluster(2);
-    println!("{}",str::from_utf8(&rootDir[0..8]).unwrap());
+    let root_dir = thefs.read_cluster(0);
+    for entry in thefs.get_entries(&root_dir) {
+    	println!("{}", entry.name);
+    }
 }
